@@ -51,12 +51,12 @@ public class AsyncPagoda implements Dispatcher {
     }
     public void serviceStart(){
 
-        eventHandlingThread = new Thread(creatThread());
+        eventHandlingThread = new Thread(createThread());
         eventHandlingThread.setName(eventHandName);
         eventHandlingThread.start();
 
     }
-    Runnable creatThread(){
+    Runnable createThread(){
 
         return new Runnable(){
 
