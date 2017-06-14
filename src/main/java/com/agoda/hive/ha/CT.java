@@ -1,7 +1,5 @@
 package com.agoda.hive.ha;
 
-import java.util.Properties;
-
 /**
  * Created by lhao on 5/2/17.
  */

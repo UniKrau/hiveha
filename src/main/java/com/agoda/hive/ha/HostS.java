@@ -3,10 +3,7 @@ package com.agoda.hive.ha;
 
 import com.cloudera.api.ClouderaManagerClientBuilder;
 import com.cloudera.api.DataView;
-import com.cloudera.api.model.ApiCluster;
-import com.cloudera.api.model.ApiClusterList;
-import com.cloudera.api.model.ApiHost;
-import com.cloudera.api.model.ApiHostList;
+import com.cloudera.api.model.*;
 import com.cloudera.api.v11.RootResourceV11;
 
 /**
@@ -27,8 +24,13 @@ public class HostS {
          HKG-----H@d0op@hkg#
          pwd = "fBrte!6gU"
          */
-        RootResourceV11 apiRoot = new ClouderaManagerClientBuilder().withHost("10.117.193.207")
-                .withUsernamePassword("admin", "H@d0op@hkg#").build().getRootV11();
+        String HKG = "H@d0op@hkg#";
+        String SGG = "H@d0op@sgp#";
+
+        String sgcm="sg-aghcm-6001";
+
+        RootResourceV11 apiRoot = new ClouderaManagerClientBuilder().withHost(sgcm)
+                .withUsernamePassword("admin", SGG).build().getRootV11();
 
 
         ApiHostList apiHosts = apiRoot.getHostsResource().readHosts(DataView.SUMMARY);
@@ -36,14 +38,8 @@ public class HostS {
         for (ApiHost host:apiHosts
              ) {
 
-            System.out.println(host.getIpAddress());
+            System.out.println(host.getHostname()+";"+host.getIpAddress()+";hk-bi-usr;"+"CreQebr2!!hkg#");
 
         }
-        ApiClusterList clusters = apiRoot.getClustersResource().readClusters(DataView.SUMMARY);
-        for (ApiCluster cluster : clusters) {
-            //System.out.println( cluster.getName()+"----"+ cluster.getVersion());
-
-        }
-
     }
 }

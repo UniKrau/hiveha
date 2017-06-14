@@ -6,5 +6,6 @@ package com.agoda.hadoop.deadlinescheduler;
 public enum  DeadlineEventType {
 
     STATED,
-    COMPLETED
+    COMPLETED,
+    RUNNING
 }

@@ -7,6 +7,8 @@ public interface Event<TYPE extends Enum<TYPE>> {
 
 
      TYPE getType();
-     long getTimestampe();
+     long getstartime();
+     long getendtime();
+
      String toString();
 }

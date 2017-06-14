@@ -1,5 +1,8 @@
 package com.agoda.hadoop.event;
 
+import com.agoda.hadoop.deadlinescheduler.DeadlineEventType;
+import com.agoda.hadoop.deadlinescheduler.DeadlineHandler;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
@@ -10,7 +13,6 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class AsyncPagoda implements Dispatcher {
 
-
     private Thread eventHandlingThread;
     private String eventHandName = "Event Handler";
 
@@ -19,19 +21,15 @@ public class AsyncPagoda implements Dispatcher {
     protected final Map<Class<? extends Enum>, EventHandler> eventDispatchers;
 
 
-    public AsyncPagoda(){
-
+    public AsyncPagoda() {
         this(new LinkedBlockingQueue<Event>());
     }
 
-    public AsyncPagoda(BlockingQueue<Event> queue){
-
+    public AsyncPagoda(BlockingQueue<Event> queue) {
         this.eventBlockingQueue = queue;
         this.eventDispatchers = new HashMap<Class<? extends Enum>, EventHandler>();
-
-
-
     }
+
     public EventHandler<Event> getEventHandler() {
         return null;
     }
@@ -40,37 +38,43 @@ public class AsyncPagoda implements Dispatcher {
 
         EventHandler<Event> reigsterHandler = (EventHandler<Event>)
                 eventDispatchers.get(eventType);
-        if(reigsterHandler == null){
+        if (reigsterHandler == null) {
             eventDispatchers.put(eventType, handler);
         }
 
     }
 
-    public void init(){
+    public void init() {
 
     }
-    public void serviceStart(){
+
+    public void serviceStart() {
 
         eventHandlingThread = new Thread(createThread());
         eventHandlingThread.setName(eventHandName);
         eventHandlingThread.start();
 
     }
-    Runnable createThread(){
 
-        return new Runnable(){
+    Runnable createThread() {
+
+        return new Runnable() {
 
             public void run() {
 
-                if (! isStop() && Thread.currentThread().isInterrupted())
-                {
+                while (!Thread.currentThread().isInterrupted()){
+                    Event event = null;
+                    try {
+                        event = eventBlockingQueue.take();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
-                    System.out.println("---");
-//                    try {
-//                        eventBlockingQueue.take();
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
+                    if( event != null){
+
+                        dispatch(event);
+                    }
+
                 }
 
             }
@@ -78,7 +82,20 @@ public class AsyncPagoda implements Dispatcher {
     }
 
 
-    private boolean isStop(){
+    private void dispatch(Event event){
+
+        Class<? extends Enum> type = event.getType().getDeclaringClass();
+
+        EventHandler<Event> handler = eventDispatchers.get(type);
+
+        if( handler != null ){
+            System.out.println("begin handle");
+            handler.handle(event);
+        }else {
+
+        }
+    }
+    private boolean isStop() {
 
         return stopped;
     }
@@ -86,6 +103,8 @@ public class AsyncPagoda implements Dispatcher {
     public static void main(String[] args) {
 
         AsyncPagoda pagoda = new AsyncPagoda();
+
+        pagoda.register(DeadlineEventType.class, new DeadlineHandler());
 
         pagoda.serviceStart();
     }

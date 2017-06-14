@@ -1,6 +1,6 @@
 package com.agoda.hadoop;
 
-import com.agoda.hadoop.deadlinescheduler.DeadlineScheduler;
+import com.agoda.hadoop.deadlinescheduler.DeadlineHandler;
 
 /**
  * Created by lhao on 5/28/17.
@@ -11,24 +11,19 @@ public class Job {
     private long serveTime = 0L;
     private long departureTime = 0L;
 
-    private DeadlineScheduler deadlineScheduler;
+    private DeadlineHandler deadlineHandler;
 
     public Job(){
 
 
     }
 
-    public long deadlinetTime(){
-
-        return deadlineScheduler.getStartTime()- deadlineScheduler.getEndTime();
+    public DeadlineHandler getDeadlineHandler() {
+        return deadlineHandler;
     }
 
-    public DeadlineScheduler getDeadlineScheduler() {
-        return deadlineScheduler;
-    }
-
-    public void setDeadlineScheduler(DeadlineScheduler deadlineScheduler) {
-        this.deadlineScheduler = deadlineScheduler;
+    public void setDeadlineHandler(DeadlineHandler deadlineHandler) {
+        this.deadlineHandler = deadlineHandler;
     }
 
     public long getArrivalTime() {
@@ -59,8 +54,8 @@ public class Job {
     public static void main(String[] args) {
 
         Job job = new Job();
-        DeadlineScheduler deadlineScheduler = new DeadlineScheduler();
-        job.setDeadlineScheduler(deadlineScheduler);
+        DeadlineHandler deadlineHandler = new DeadlineHandler();
+        job.setDeadlineHandler(deadlineHandler);
 
     }
 }
