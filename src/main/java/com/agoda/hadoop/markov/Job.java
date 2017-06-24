@@ -3,7 +3,7 @@ package com.agoda.hadoop.markov;
 /**
  * Created by lhao on 6/12/17.
  */
-public class Customer {
+public class Job {
     private double arrivalTime = 0.0;//客户到达时刻
     private double serviceTime = 0.0;//客户接受服务的时间
     private double departureTime = 0.0;//客户离开时刻=客户到达时刻+客户等待时间+客户接受服务时间
@@ -35,7 +35,7 @@ public class Customer {
 
     @Override
     public String toString() {
-        return "Customer stay time = " + (departureTime - arrivalTime)
+        return "Job stay time = " + (departureTime - arrivalTime)
                 + ", and wait time = "
                 + (departureTime - arrivalTime - serviceTime);
     }

@@ -19,7 +19,7 @@ public class MMCQueue {
 
     private static final Logger LOG = Logger.getLogger(MMCQueue.class);
 
-    private Queue<Customer> customers = new LinkedBlockingDeque<Customer>();//用于产生客户的队列
+    private Queue<Job> jobs = new LinkedBlockingDeque<Job>();
 
     private double actualArrivalRate;
     private double actualServiceRate;
@@ -31,17 +31,17 @@ public class MMCQueue {
     private ExecutorService executorService;
     private List<Server> servers = new ArrayList<Server>();
 
-    public Queue<Customer> getCustomers() {
-        return customers;
+    public Queue<Job> getJobs() {
+        return jobs;
     }
 
     public static void main(String args[]) {
-        //Read user input
+
         SERVER_NUMBER = 10;
 
-        MAX_NUMBER_OF_CUSTOMERS =24; //产生的客户最大数目
+        MAX_NUMBER_OF_CUSTOMERS = 10000;
 
-        double lamda = 0.655;
+        double lamda = 0.654;
 
         double mu = 0.54;
 
@@ -104,7 +104,7 @@ public class MMCQueue {
 
         double arrivalIntervalTotal = 0.0;
         double serviceTimeTotal = 0.0;
-        //创建客户
+
         for (int i = 0; i < MAX_NUMBER_OF_CUSTOMERS; i++) {
             arrivalInterval = RandomGengertor.generateNegativeIndexDistrRand(this.lamda);
             serviceTime = RandomGengertor.generateNormalDistrRand(
@@ -112,13 +112,13 @@ public class MMCQueue {
             arrivalIntervalTotal += arrivalInterval;
             serviceTimeTotal += serviceTime;
 
-            Customer customer = new Customer();
-            //后面客户到达时刻=前面所有客户到达时刻之和
-            customer.setArrivalTime(arrivalIntervalTotal);
-            customer.setServiceTime(serviceTime);
-            customers.add(customer);
+            Job job = new Job();
+
+            job.setArrivalTime(arrivalIntervalTotal);
+            job.setServiceTime(serviceTime);
+            jobs.add(job);
             if (MMCQueue.DEBUG_MODE) {
-                LOG.info(customer);
+                LOG.info(job);
             }
         }
 
@@ -146,7 +146,7 @@ public class MMCQueue {
         }
     }
 
-    //启动服务窗口线程
+
     public void startServers(int serverNumber) {
         if (serverNumber < 0) {
             throw new IllegalArgumentException(
@@ -172,20 +172,20 @@ public class MMCQueue {
     public void addCustomerToServerQueue() {//将客户添加到等待队列最短的服务窗口
         executorService.execute(new Runnable() {
             public void run() {
-                while (customers.size() > 0) {
+                while (jobs.size() > 0) {
                     if (MMCQueue.DEBUG_MODE) {
-                        LOG.info("customers.size() = "
-                                + customers.size());
+                        LOG.info("jobs.size() = "
+                                + jobs.size());
                     }
                     for (int i = 0; i < SERVER_NUMBER; i++) {
-                        Customer nextCustomer = null;
+                        Job nextJob = null;
                         try {
-                            nextCustomer = customers.remove();
+                            nextJob = jobs.remove();
                         } catch (NoSuchElementException e) {
                             break;
                         }
                         Server availableServer = findShortestWaitQueueServer();
-                        availableServer.serviceCustomer(nextCustomer);//将客户添加到等待队列最短的服务窗口等待队列中
+                        availableServer.serviceCustomer(nextJob);
                     }
                     notifyAllServers();
                 }
@@ -199,16 +199,12 @@ public class MMCQueue {
 
                 for (Server server : servers) {
                     if (server.getCustomerNumber() < shortestCustomerQueueNumber) {
-//                        if (MMCQueue.DEBUG_MODE) {
-//                            LOG.info("Server " + server.getServerId()
-//                                    + " Q Len = " + server.getCustomerNumber());
-//                        }
+
                         shortestCustomerQueueNumber = server
                                 .getCustomerNumber();
                         bestSuitableServer = server;
                     }
                 }
-
                 return bestSuitableServer;
 
             }
